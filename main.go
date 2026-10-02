@@ -15,6 +15,8 @@ var version = "dev"
 // Texts that the user sees (French, from the D-HELPER contract).
 const (
 	msgRootNotFound = "D-HELPER ne trouve pas le dossier Dropbox Dahotecc sur ce poste."
+	msgInstalled    = "D-HELPER est installé. Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur."
+	msgUninstalled  = "D-HELPER est désinstallé."
 )
 
 func main() {
@@ -39,6 +41,10 @@ func run(args []string) int {
 	case len(args) == 1 && args[0] == "--version":
 		report("D-HELPER " + version)
 		return 0
+	case len(args) == 1 && args[0] == "--install":
+		return doInstall()
+	case len(args) == 1 && args[0] == "--uninstall":
+		return doUninstall()
 	case len(args) == 2 && args[0] == "--check":
 		// Hidden option for the tests: check a link, write the result, do not open a folder.
 		return checkLink(args[1])
@@ -102,6 +108,29 @@ func errorMessage(err error, rel string) string {
 	}
 }
 
+// doInstall installs D-HELPER and shows the result.
+func doInstall() int {
+	exe, err := install()
+	if err != nil {
+		showError("Installation de D-HELPER impossible : " + err.Error())
+		return 1
+	}
+	showInfo(msgInstalled + "\n\nProgramme installé : " + exe)
+	return 0
+}
+
+// doUninstall removes the d-helper:// protocol and shows the result.
+// The copy of the program stays. The message tells where it is.
+func doUninstall() int {
+	exe, err := uninstall()
+	if err != nil {
+		showError("Désinstallation de D-HELPER impossible : " + err.Error())
+		return 1
+	}
+	showInfo(msgUninstalled + "\n\nVous pouvez supprimer le programme : " + exe)
+	return 0
+}
+
 // report writes a text on the standard output.
 // If there is no standard output (program started without a console), it shows a message box.
 func report(text string) {
@@ -115,6 +144,8 @@ func helpText() string {
 	return "D-HELPER " + version + "\n" +
 		"Ouvre dans l'explorateur un dossier Dahotecc depuis un lien d-helper:// de D-HUB.\n\n" +
 		"Utilisation :\n" +
+		"  d-helper.exe --install     installe D-HELPER pour l'utilisateur courant\n" +
+		"  d-helper.exe --uninstall   désinstalle D-HELPER\n" +
 		"  d-helper.exe --version     affiche la version\n" +
 		"  d-helper.exe --help        affiche cette aide"
 }
