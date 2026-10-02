@@ -31,8 +31,9 @@
 - Donne-moi ta recommandation avec une phrase de justification, pas juste une liste neutre d'options.
 - Pose-moi la question seulement quand le choix change vraiment ce que tu vas faire ; sinon prends la décision par défaut et dis-le en une ligne.
 
-## Fin de session : PR automatique (skill `post-pr`)
-- Le travail se fait sur `dev`. À la fin de chaque session qui a modifié ce repo, applique la skill `post-pr` (`.claude/skills/post-pr/SKILL.md`) sans attendre que je le demande : commits restants, contrôles locaux, push de `dev`, puis création ou mise à jour de l'unique PR `dev` -> `main` avec sa description complète en français.
-- Autorisation permanente : commit et push sur `dev`, création et modification de cette PR.
-- Pas d'autorisation permanente pour le merge : merger la PR publie une nouvelle Release de `d-helper.exe`. Tu merges uniquement si je le demande explicitement dans la session.
+## Git : commit et push libres, PR sur demande (skill `post-pr`)
+- Le travail se fait sur `dev`. Commits atomiques et push de `dev` autorisés à tout moment, sans demander (un push sur `dev` lance seulement le workflow `ci`).
+- La création ou la modification de la PR `dev` -> `main` se fait UNIQUEMENT quand je la demande : applique alors la skill `post-pr` (`.claude/skills/post-pr/SKILL.md`).
+- Ne clôture jamais une session de ta propre initiative.
+- Pas d'autorisation permanente pour le merge : merger la PR met en production (ou publie une Release). Tu merges uniquement si je le demande explicitement dans la session.
 - Jamais de commit ni de push direct sur `main`.
