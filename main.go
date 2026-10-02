@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 // version is set at build time: -ldflags "-X main.version=sha-xxxxxxx".
@@ -17,6 +18,11 @@ const (
 	msgRootNotFound = "D-HELPER ne trouve pas le dossier Dropbox Dahotecc sur ce poste."
 	msgInstalled    = "D-HELPER est installé. Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur."
 	msgUninstalled  = "D-HELPER est désinstallé."
+
+	// Questions of a start without arguments (double-click on the program).
+	msgAskInstall = "Installer D-HELPER sur ce poste ? Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur."
+	msgAskUpdate  = "Mettre à jour D-HELPER sur ce poste ?"
+	msgAskRepair  = "D-HELPER est déjà installé sur ce poste. Réparer l'installation ?"
 )
 
 func main() {
@@ -26,8 +32,8 @@ func main() {
 // run does the command of the arguments and gives the exit code.
 func run(args []string) int {
 	if len(args) == 0 {
-		report(helpText())
-		return 0
+		// Double-click on the program: install, update or repair.
+		return doStart()
 	}
 	// The browser gives the link as the only argument.
 	if len(args) == 1 && isLink(args[0]) {
@@ -108,11 +114,51 @@ func errorMessage(err error, rel string) string {
 	}
 }
 
-// doInstall installs D-HELPER and shows the result.
-func doInstall() int {
-	exe, err := install()
+// doStart is the start without arguments (double-click on the program).
+// It asks the user, then installs, updates or repairs D-HELPER.
+// If the user clicks "Non", it does nothing and shows no other message.
+func doStart() int {
+	running, err := os.Executable()
 	if err != nil {
 		showError("Installation de D-HELPER impossible : " + err.Error())
+		return 1
+	}
+	dest, err := installPath()
+	if err != nil {
+		showError("Installation de D-HELPER impossible : " + err.Error())
+		return 1
+	}
+
+	switch chooseAction(running, filepath.Dir(dest), isInstalled(dest)) {
+	case actionRepair:
+		if !askYesNo(msgAskRepair) {
+			return 0
+		}
+		return showInstallResult("Réparation de D-HELPER impossible : ", repair)
+	case actionUpdate:
+		if !askYesNo(msgAskUpdate) {
+			return 0
+		}
+		return showInstallResult("Mise à jour de D-HELPER impossible : ", install)
+	default:
+		if !askYesNo(msgAskInstall) {
+			return 0
+		}
+		return doInstall()
+	}
+}
+
+// doInstall installs D-HELPER and shows the result.
+func doInstall() int {
+	return showInstallResult("Installation de D-HELPER impossible : ", install)
+}
+
+// showInstallResult does the step and shows the result.
+// If an error occurs, the message starts with failure.
+func showInstallResult(failure string, step func() (string, error)) int {
+	exe, err := step()
+	if err != nil {
+		showError(failure + err.Error())
 		return 1
 	}
 	showInfo(msgInstalled + "\n\nProgramme installé : " + exe)
@@ -144,6 +190,7 @@ func helpText() string {
 	return "D-HELPER " + version + "\n" +
 		"Ouvre dans l'explorateur un dossier Dahotecc depuis un lien d-helper:// de D-HUB.\n\n" +
 		"Utilisation :\n" +
+		"  d-helper.exe               (double-clic) installe, met à jour ou répare D-HELPER\n" +
 		"  d-helper.exe --install     installe D-HELPER pour l'utilisateur courant\n" +
 		"  d-helper.exe --uninstall   désinstalle D-HELPER\n" +
 		"  d-helper.exe --version     affiche la version\n" +

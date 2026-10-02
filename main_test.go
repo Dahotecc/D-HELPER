@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -54,5 +55,18 @@ func TestRunUnknownArguments(t *testing.T) {
 		if got := run(args); got != 2 {
 			t.Errorf("run(%q) = %d, want 2", args, got)
 		}
+	}
+}
+
+// A start without arguments asks a question. The test replacement of askYesNo gives "Non":
+// the program stops with the code 0 and does not install anything.
+func TestRunNoArguments(t *testing.T) {
+	localAppData := t.TempDir()
+	t.Setenv("LOCALAPPDATA", localAppData)
+	if got := run(nil); got != 0 {
+		t.Errorf("run() = %d, want 0", got)
+	}
+	if _, err := os.Stat(filepath.Join(localAppData, "Programs")); !os.IsNotExist(err) {
+		t.Error("answer \"Non\": nothing must be installed")
 	}
 }
