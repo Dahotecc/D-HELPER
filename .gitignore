@@ -1,0 +1,9 @@
+# Build output.
+dist/
+*.exe
+*.exe.sha256
+*.test
+*.out
+
+# Local files.
+.env

@@ -1,0 +1,6 @@
+# Keep LF line endings in the repository and in the working copy.
+# Go files, YAML files and scripts must have LF on all computers.
+* text=auto eol=lf
+*.exe binary
+*.ico binary
+*.png binary
