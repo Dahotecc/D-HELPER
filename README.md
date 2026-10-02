@@ -8,7 +8,7 @@ D-HELPER tourne uniquement sur les postes Windows, jamais sur le NUC. Il ne fait
 
 1. Dans D-HUB, l'utilisateur clique sur « Ouvrir le dossier ».
 2. Si le navigateur n'est pas sur le serveur, D-HUB navigue vers un lien `d-helper://` (et copie le chemin dans le presse-papiers).
-3. Windows lance `d-helper.exe` avec ce lien (protocole enregistré par `--install`).
+3. Windows lance `d-helper.exe` avec ce lien (protocole enregistré à l'installation).
 4. D-HELPER vérifie le lien, trouve le dossier Dahotecc du poste, vérifie que le dossier demandé y est bien, puis lance `explorer.exe` sur ce dossier.
 5. En cas de problème, une fenêtre de message explique pourquoi. Aucune fenêtre console ne s'affiche.
 
@@ -36,35 +36,55 @@ d-helper://open?path=<chemin relatif encodé>
 | Racine introuvable | D-HELPER ne trouve pas le dossier Dropbox Dahotecc sur ce poste. |
 | Lien refusé | Lien D-HELPER refusé : <raison courte>. |
 | Dossier absent | Dossier introuvable : <chemin relatif>. Il a peut-être été déplacé ; relisez le Dropbox dans D-HUB. |
-| Installation | D-HELPER est installé. Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur. |
+| Double-clic, pas encore installé | Installer D-HELPER sur ce poste ? Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur. (Oui/Non) |
+| Double-clic, déjà installé | Mettre à jour D-HELPER sur ce poste ? (Oui/Non) |
+| Double-clic sur le programme installé | D-HELPER est déjà installé sur ce poste. Réparer l'installation ? (Oui/Non) |
+| Installation, mise à jour, réparation | D-HELPER est installé. Les liens « Ouvrir le dossier » de D-HUB ouvriront l'explorateur. |
+| Programme installé en cours d'utilisation | ... impossible : le programme installé est en cours d'utilisation. Fermez les fenêtres D-HELPER puis relancez. |
 | Désinstallation | D-HELPER est désinstallé. (avec l'emplacement du programme à supprimer) |
 
 ## Installation sur un poste
 
-À faire une fois par poste et par utilisateur Windows. Pas besoin de droits administrateur.
+À faire une fois par poste et par utilisateur Windows. Pas besoin de droits administrateur, pas besoin de ligne de commande.
 
-1. Récupérer `d-helper.exe` :
-   - soit dans la dernière Release GitHub du dépôt (`Releases` > `D-HELPER sha-xxxxxxx` > `d-helper.exe`) ;
-   - soit dans la copie déposée dans le Dropbox Dahotecc.
-2. (Facultatif) Vérifier l'empreinte, dans PowerShell, dans le dossier du fichier : `Get-FileHash .\d-helper.exe` doit donner la valeur du fichier `d-helper.exe.sha256` de la Release.
-3. Ouvrir PowerShell dans le dossier du fichier et lancer :
-
-   ```powershell
-   .\d-helper.exe --install
-   ```
-
+1. Télécharger `d-helper.exe` depuis D-HUB : après un clic sur « Ouvrir le dossier », l'alerte « Rien ne s'est ouvert ? » propose « Télécharger D-HELPER ». (Autres sources : la dernière Release GitHub du dépôt, ou la copie déposée dans le Dropbox Dahotecc.)
+2. Le navigateur peut avertir que ce type de fichier peut être dangereux (programme non signé, peu téléchargé). Choisir « Conserver » (Edge : « ... » > « Conserver », puis « Afficher plus » > « Conserver quand même » ; Chrome : « Conserver »).
+3. Double-cliquer sur `d-helper.exe` (dans le dossier Téléchargements, ou depuis la liste des téléchargements du navigateur).
 4. Windows SmartScreen peut afficher « Windows a protégé votre ordinateur » (le programme n'est pas signé). Cliquer sur « Informations complémentaires », puis sur « Exécuter quand même ».
-5. Le message « D-HELPER est installé... » s'affiche.
+5. D-HELPER demande « Installer D-HELPER sur ce poste ? ». Cliquer sur « Oui ». (« Non » ne fait rien.)
+6. Le message « D-HELPER est installé... » s'affiche.
 
 L'installation copie le programme dans `%LOCALAPPDATA%\Programs\d-helper\d-helper.exe` et enregistre le protocole `d-helper://` pour l'utilisateur courant (registre `HKEY_CURRENT_USER\Software\Classes\d-helper`). Le fichier téléchargé peut ensuite être supprimé.
 
-Mise à jour : télécharger la nouvelle version et relancer `.\d-helper.exe --install`. La copie installée est remplacée.
+(Facultatif) Vérifier l'empreinte d'un fichier de la Release, dans PowerShell, dans le dossier du fichier : `Get-FileHash .\d-helper.exe` doit donner la valeur du fichier `d-helper.exe.sha256`.
+
+### Mise à jour
+
+Même geste : télécharger la nouvelle version depuis D-HUB, double-cliquer dessus, puis répondre « Oui » à « Mettre à jour D-HELPER sur ce poste ? ». La copie installée est remplacée.
+
+Si la copie installée est en cours d'utilisation (une fenêtre de message D-HELPER est encore ouverte), D-HELPER la met de côté (`d-helper.exe.old`, supprimé à la mise à jour suivante) avant de la remplacer. Si ce n'est pas possible, le message demande de fermer les fenêtres D-HELPER puis de relancer.
+
+### Réparation
+
+Un double-clic sur le programme installé (`%LOCALAPPDATA%\Programs\d-helper\d-helper.exe`) demande « D-HELPER est déjà installé sur ce poste. Réparer l'installation ? ». « Oui » enregistre à nouveau le protocole `d-helper://`, sans copier le programme.
+
+### En ligne de commande
+
+`d-helper.exe --install` fait la même installation sans question. `d-helper.exe --help` affiche les options.
 
 ## Première utilisation
 
 Au premier clic sur « Ouvrir le dossier », le navigateur demande « Ouvrir D-HELPER ? » (ou « Ouvrir d-helper.exe ? »). Cocher « Toujours autoriser » (case proposée quand D-HUB est en HTTPS ; sinon la question revient à chaque clic), puis cliquer sur « Ouvrir ».
 
 ## Désinstallation
+
+Touches Windows + R, puis coller la ligne suivante et valider :
+
+```
+%LOCALAPPDATA%\Programs\d-helper\d-helper.exe --uninstall
+```
+
+Ou, dans PowerShell :
 
 ```powershell
 & "$env:LOCALAPPDATA\Programs\d-helper\d-helper.exe" --uninstall
@@ -109,10 +129,10 @@ Organisation du code :
 
 | Fichier | Rôle |
 |---|---|
-| `main.go` | arguments (`--install`, `--uninstall`, `--version`, `--help`, lien) et messages |
+| `main.go` | arguments (aucun = double-clic, `--install`, `--uninstall`, `--version`, `--help`, lien) et messages |
 | `link.go` | lecture du lien et toutes les règles de sécurité |
 | `root.go` | recherche de la racine Dahotecc (`D_HELPER_ROOT`, puis `info.json`) |
-| `install.go` | copie du programme, appel du registre |
+| `install.go` | choix de l'action au double-clic, copie du programme, appel du registre |
 | `*_windows.go` | registre, fenêtre de message, `explorer.exe`, chemin réel (jonctions) |
 | `*_other.go` | remplacements pour lancer les tests sous Linux |
 | `*_test.go` | tests |
@@ -136,4 +156,4 @@ Pour tester sur un dossier de test plutôt que sur le vrai Dropbox : `$env:D_HEL
 1. Travail sur `dev` ; chaque push lance le workflow `ci` (format, `go vet`, tests, build Windows).
 2. PR `dev` -> `main`, CI verte, merge par merge commit.
 3. Le push sur `main` lance le workflow `release` : tests, build de `d-helper.exe` (version `sha-<court>`), fichier `d-helper.exe.sha256`, puis Release GitHub avec le tag `sha-<court>`. Les notes de version reprennent les sujets de commit, sans les domaines techniques (`CI`, `Docker`, `Git`, `Doc`, `Santé`, `Sauvegarde`, `Config`, `Style`).
-4. Déposer la nouvelle version dans le Dropbox Dahotecc pour les postes, qui relancent `--install`.
+4. Rendre la nouvelle version disponible dans D-HUB (et dans le Dropbox Dahotecc) : chaque poste la télécharge et fait un double-clic dessus (« Mettre à jour D-HELPER sur ce poste ? » > « Oui »).
