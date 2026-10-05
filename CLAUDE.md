@@ -31,9 +31,9 @@
 - Donne-moi ta recommandation avec une phrase de justification, pas juste une liste neutre d'options.
 - Pose-moi la question seulement quand le choix change vraiment ce que tu vas faire ; sinon prends la décision par défaut et dis-le en une ligne.
 
-## Git : commit et push libres, PR sur demande (skill `post-pr`)
+## Git : commit, push et PR autonomes, merge sur demande (skill `post-pr`)
 - Le travail se fait sur `dev`. Commits atomiques et push de `dev` autorisés à tout moment, sans demander (un push sur `dev` lance seulement le workflow `ci`).
-- La création ou la modification de la PR `dev` -> `main` se fait UNIQUEMENT quand je la demande : applique alors la skill `post-pr` (`.claude/skills/post-pr/SKILL.md`).
+- La PR `dev` -> `main` est créée et tenue à jour de façon autonome avec la skill `post-pr` (`.claude/skills/post-pr/SKILL.md`), après les pushs significatifs.
 - Ne clôture jamais une session de ta propre initiative.
 - Pas d'autorisation permanente pour le merge : merger la PR met en production (ou publie une Release). Tu merges uniquement si je le demande explicitement dans la session.
 - Jamais de commit ni de push direct sur `main`.

@@ -1,13 +1,13 @@
 ---
 name: post-pr
-description: Build or update the single pull request dev -> main of a D-* repo with a complete French description. Use it ONLY when the user asks for the pull request. Commits and pushes on dev are allowed at any time without this skill. Never merge without an explicit request from the user.
+description: Create or update the single pull request dev -> main of a D-* repo with a complete French description. Use it autonomously after meaningful pushes on dev, or when the user asks. Never merge without an explicit request from the user.
 ---
 
-# post-pr: build or update the dev -> main pull request (on request only)
+# post-pr: create or update the dev -> main pull request
 
-Use this procedure only when the user asks for the pull request.
-The user gave a standing authorization to commit on `dev` and to push `dev` at any time.
-The pull request itself (create or edit) is done only on request.
+Use this procedure after meaningful pushes on `dev`, or when the user asks.
+The user gave a standing authorization to commit on `dev`, push `dev`,
+and create or edit the pull request `dev` -> `main`.
 The user did NOT give an authorization to merge. Merge only when the user asks for it in this session.
 
 Conventions: refer to D-OPS `docs/conventions.md` (sections 9, 12, 13, 14).
