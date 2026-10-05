@@ -24,7 +24,7 @@
 
 ## Sécurité
 - N'importe quel site web peut déclencher un lien `d-helper://` : D-HELPER ne fait confiance à rien de ce qu'il reçoit. Ne relâche jamais une règle de validation sans mon accord.
-- Si un secret (mot de passe, clé API, token) doit exister, il ne doit jamais être committé en clair. D-HELPER n'en a aucun et ne fait aucune connexion réseau.
+- Si un secret (mot de passe, clé API, token) doit exister, il ne doit jamais être committé en clair. D-HELPER n'en a aucun. Sa seule connexion réseau est la vérification des mises à jour, vers une adresse GitHub fixe dans le code (`update.go`) ; aucune donnée d'un lien d-helper:// ne l'influence.
 - Signale-moi explicitement toute décision qui a un impact sécurité, même mineur, avant de l'implémenter.
 
 ## Quand tu vois plusieurs options
