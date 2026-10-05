@@ -1,6 +1,16 @@
 // Command d-helper opens a folder of the Dahotecc Dropbox root in the Windows explorer.
 // The browser starts it with a link: d-helper://open?path=<encoded relative path>.
-// Refer to README.md for the link format and the security rules.
+//
+// Where to find the details:
+//   - link.go: the link format and all the security rules of the link.
+//   - root.go: the Dahotecc root (variable D_HELPER_ROOT, then the Dropbox info.json file).
+//   - install.go: install, update by double-click, repair, uninstall.
+//   - update.go: the automatic update from GitHub (the only network connection).
+//
+// Test on Windows without opening a folder: the hidden option --check writes the result.
+// The program has no console, thus use "| Write-Output" in PowerShell:
+//
+//	.\d-helper.exe --check "d-helper://open?path=Devis%202026" | Write-Output
 package main
 
 import (
@@ -8,9 +18,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-// version is set at build time: -ldflags "-X main.version=sha-xxxxxxx".
+// version is set at build time: -ldflags "-X main.version=AAAA.MM.JJ.HHMM".
+// The version "dev" never checks for an update.
 var version = "dev"
 
 // Texts that the user sees (French, from the D-HELPER contract).
@@ -51,6 +63,9 @@ func run(args []string) int {
 		return doInstall()
 	case len(args) == 1 && args[0] == "--uninstall":
 		return doUninstall()
+	case len(args) == 1 && args[0] == "--update":
+		// Immediate check, without the 24-hour limit.
+		return runUpdate(time.Now(), true)
 	case len(args) == 2 && args[0] == "--check":
 		// Hidden option for the tests: check a link, write the result, do not open a folder.
 		return checkLink(args[1])
@@ -70,6 +85,9 @@ func openLink(raw string) int {
 		showError("D-HELPER ne peut pas ouvrir l'explorateur : " + err.Error())
 		return 1
 	}
+	// The folder is open. Then check for an update (one time in 24 hours at most).
+	// No data of the link goes to the update.
+	autoUpdate()
 	return 0
 }
 
@@ -193,6 +211,7 @@ func helpText() string {
 		"  d-helper.exe               (double-clic) installe, met à jour ou répare D-HELPER\n" +
 		"  d-helper.exe --install     installe D-HELPER pour l'utilisateur courant\n" +
 		"  d-helper.exe --uninstall   désinstalle D-HELPER\n" +
+		"  d-helper.exe --update      cherche et propose la dernière version publiée sur GitHub\n" +
 		"  d-helper.exe --version     affiche la version\n" +
 		"  d-helper.exe --help        affiche cette aide"
 }
